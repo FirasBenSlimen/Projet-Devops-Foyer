@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.3.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  springboot_app:
+    image: firasprojet/tpfoyer:1.0.0 # Remplace par ton image Docker Hub
+    depends_on:
+      - mysql
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db?createDatabaseIfNotExist=true # MySQL écoute sur le port 3306 à l'intérieur du conteneur.
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8089
+      SERVER_SERVLET_CONTEXT_PATH: /tpfoyer
+    ports:
+      - "8089:8089"
+
+volumes:
+  mysql_data:
