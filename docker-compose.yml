@@ -15,17 +15,20 @@ services:
   mysqld_exporter:
     image: prom/mysqld-exporter:latest
     restart: unless-stopped
+    command:
+      - --config.my-cnf=/cfg/.my.cnf
+      - --mysqld.address=172.17.0.1:3306
     environment:
-      DATA_SOURCE_NAME: root:root@(mysql:3306)/db # Utilise les identifiants de la base de données MySQL
+      DATA_SOURCE_NAME: root:root@(mysql:3306)/db # Utilisation de root
     ports:
       - "9104:9104"
     volumes:
-      - /home/firas/.my.cnf:/etc/.my.cnf # Montez le fichier de configuration
+      - "./.my.cnf:/cfg/.my.cnf"
     depends_on:
       - mysql
 
   springboot_app:
-    image: firasprojet/tpfoyer:1.0.0 # Remplacez par l'image Docker Hub
+    image: firasprojet/tpfoyer:1.0.0
     depends_on:
       - mysql
     restart: on-failure
