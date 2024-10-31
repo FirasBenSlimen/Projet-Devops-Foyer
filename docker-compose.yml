@@ -37,14 +37,5 @@ services:
     ports:
       - "8089:8089"
 
-  prometheus:
-    image: prom/prometheus:latest
-    restart: unless-stopped
-    ports:
-      - "9090:9090"
-    depends_on:
-      - mysqld_exporter
-      - springboot_app
-
 volumes:
   mysql_data:
