@@ -19,11 +19,13 @@ services:
       DATA_SOURCE_NAME: root:root@(mysql:3306)/db # Utilise les identifiants de la base de données MySQL
     ports:
       - "9104:9104"
+    volumes:
+      - /home/firas/.my.cnf:/etc/.my.cnf # Montez le fichier de configuration
     depends_on:
       - mysql
 
   springboot_app:
-    image: firasprojet/tpfoyer:1.0.0 # Remplace par l'image Docker Hub
+    image: firasprojet/tpfoyer:1.0.0 # Remplacez par l'image Docker Hub
     depends_on:
       - mysql
     restart: on-failure
