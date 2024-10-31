@@ -12,13 +12,23 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  mysqld_exporter:
+    image: prom/mysqld-exporter:latest
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: root:root@(mysql:3306)/db # Utilise les identifiants de la base de données MySQL
+    ports:
+      - "9104:9104"
+    depends_on:
+      - mysql
+
   springboot_app:
-    image: firasprojet/tpfoyer:1.0.0 # Remplace par ton image Docker Hub
+    image: firasprojet/tpfoyer:1.0.0 # Remplace par l'image Docker Hub
     depends_on:
       - mysql
     restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db?createDatabaseIfNotExist=true # MySQL écoute sur le port 3306 à l'intérieur du conteneur.
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db?createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -26,6 +36,15 @@ services:
       SERVER_SERVLET_CONTEXT_PATH: /tpfoyer
     ports:
       - "8089:8089"
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    depends_on:
+      - mysqld_exporter
+      - springboot_app
 
 volumes:
   mysql_data:
